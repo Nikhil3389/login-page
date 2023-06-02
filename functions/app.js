@@ -12,8 +12,8 @@ app.use(express.urlencoded({ extended: false }));
 const jwt = require("jsonwebtoken");
 var nodemailer = require("nodemailer");
 
-// const JWT_SECRET =
-//   "hvdvay6ert72839289()aiyg8t87qt72393293883uhefiuh78ttq3ifi78272jbkj?[]]pou89ywe";
+const JWT_SECRET =
+  "hvdvay6ert72839289()aiyg8t87qt72393293883uhefiuh78ttq3ifi78272jbkj?[]]pou89ywe";
 
 const mongoUrl =
   "mongodb+srv://adarsh:adarsh@cluster0.zllye.mongodb.net/?retryWrites=true&w=majority";
@@ -63,7 +63,7 @@ app.post("/login-user", async (req, res) => {
     return res.json({ error: "User Not found" });
   }
   if (await bcrypt.compare(password, user.password)) {
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ email: user.email }, JWT_SECRET, {
       expiresIn: "15m",
     });
 
@@ -79,7 +79,7 @@ app.post("/login-user", async (req, res) => {
 app.post("/userData", async (req, res) => {
   const { token } = req.body;
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET, (err, res) => {
+    const user = jwt.verify(token, JWT_SECRET, (err, res) => {
       if (err) {
         return "token expired";
       }
@@ -112,7 +112,7 @@ app.post("/forgot-password", async (req, res) => {
     if (!oldUser) {
       return res.json({ status: "User Not Exists!!" });
     }
-    const secret = process.env.JWT_SECRET + oldUser.password;
+    const secret = JWT_SECRET + oldUser.password;
     const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
       expiresIn: "5m",
     });
@@ -150,7 +150,7 @@ app.get("/reset-password/:id/:token", async (req, res) => {
   if (!oldUser) {
     return res.json({ status: "User Not Exists!!" });
   }
-  const secret = process.env.JWT_SECRET + oldUser.password;
+  const secret = JWT_SECRET + oldUser.password;
   try {
     const verify = jwt.verify(token, secret);
     res.render("index", { email: verify.email, status: "Not Verified" });
@@ -168,7 +168,7 @@ app.post("/reset-password/:id/:token", async (req, res) => {
   if (!oldUser) {
     return res.json({ status: "User Not Exists!!" });
   }
-  const secret = process.env.JWT_SECRET + oldUser.password;
+  const secret = JWT_SECRET + oldUser.password;
   try {
     const verify = jwt.verify(token, secret);
     const encryptedPassword = await bcrypt.hash(password, 10);
